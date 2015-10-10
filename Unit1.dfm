@@ -30,6 +30,7 @@ object Form1: TForm1
     TitleFont.Name = 'MS Sans Serif'
     TitleFont.Style = []
     OnDblClick = dbgrd1DblClick
+    OnKeyDown = dbgrd1KeyDown
   end
   object pnl1: TPanel
     Left = 0
@@ -47,9 +48,11 @@ object Form1: TForm1
       ImeName = #23567#29436#27627
       TabOrder = 0
       Text = 'Software\MyCompanyName\MyApplication\'
+      OnKeyDown = edt1KeyDown
+      OnKeyPress = edt1KeyPress
     end
     object btn2: TButton
-      Left = 520
+      Left = 488
       Top = 16
       Width = 49
       Height = 25
@@ -67,6 +70,7 @@ object Form1: TForm1
       ItemIndex = 1
       TabOrder = 2
       Text = ' HKEY_CURRENT_USER'
+      OnChange = cbb1Change
       Items.Strings = (
         ' HKEY_CLASSES_ROOT'
         ' HKEY_CURRENT_USER'
@@ -77,7 +81,7 @@ object Form1: TForm1
         ' HKEY_DYN_DATA         ')
     end
     object btnUp: TButton
-      Left = 576
+      Left = 544
       Top = 16
       Width = 49
       Height = 25
@@ -86,16 +90,17 @@ object Form1: TForm1
       OnClick = btnUpClick
     end
     object btnDel: TButton
-      Left = 640
+      Left = 664
       Top = 16
       Width = 49
       Height = 25
       Caption = 'Delete'
       TabOrder = 4
+      Visible = False
       OnClick = btnDelClick
     end
     object btnEdit: TButton
-      Left = 696
+      Left = 728
       Top = 16
       Width = 49
       Height = 25
@@ -104,7 +109,7 @@ object Form1: TForm1
       OnClick = btnEditClick
     end
     object btnRoot: TButton
-      Left = 752
+      Left = 600
       Top = 16
       Width = 49
       Height = 25
@@ -113,32 +118,27 @@ object Form1: TForm1
       OnClick = btnRootClick
     end
     object btnAdd: TButton
-      Left = 808
+      Left = 784
       Top = 16
       Width = 49
       Height = 25
       Caption = 'Add Key'
       TabOrder = 7
+      Visible = False
       OnClick = btnAddClick
     end
     object btnTest: TButton
-      Left = 864
+      Left = 848
       Top = 16
       Width = 33
       Height = 25
       Caption = 'T'
       TabOrder = 8
+      OnClick = btnTestClick
     end
   end
   object ds1: TDataSource
-    DataSet = ds2
     Left = 112
-    Top = 64
-  end
-  object ds2: TClientDataSet
-    Aggregates = <>
-    Params = <>
-    Left = 168
     Top = 64
   end
 end

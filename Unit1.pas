@@ -4,13 +4,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DB, DBClient, Grids, DBGrids, ExtCtrls;
+  Dialogs, StdCtrls, DB, DBClient, Grids, DBGrids, ExtCtrls,AliasOfSys,ukeyForm;
 
 type
   TForm1 = class(TForm)
     dbgrd1: TDBGrid;
     ds1: TDataSource;
-    ds2: TClientDataSet;
     pnl1: TPanel;
     edt1: TEdit;
     btn2: TButton;
@@ -30,11 +29,22 @@ type
     procedure btnAddClick(Sender: TObject);
     procedure btnDelClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
+    procedure cbb1Change(Sender: TObject);
+    procedure edt1KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edt1KeyPress(Sender: TObject; var Key: Char);
+    procedure dbgrd1KeyPress(Sender: TObject; var Key: Char);
+    procedure dbgrd1KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure btnTestClick(Sender: TObject);
   private
     procedure Load(w: DWORD; Key: String);
+    procedure ReloadReg;
+    procedure NavigateDown(path: string);
     { Private declarations }
   public
     { Public declarations }
+    ds2 : MemTable;
   end;
 
 var
@@ -46,19 +56,21 @@ uses registry;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-//  ds2.FieldDefs.Add('ID',      ftInteger, 0, False);
-//  ds2.FieldDefs.Add('Status',  ftString, 10, False);
-//  ds2.FieldDefs.Add('Created', ftDate,    0, False);
-//  ds2.FieldDefs.Add('Volume',  ftFloat,   0, False);
+  ds2 := MemTable.Create(nil);
   ds2.FieldDefs.Add('Name',  ftString, 250, False);
   ds2.FieldDefs.Add('Value', ftString,  250, False);
-  ds2.FieldDefs.Add('Type',  ftString,   250, False);// Key,Reg_String...
-  ds2.CreateDataSet;
+  ds2.FieldDefs.Add('Type',  ftString,   250, False);
+  (ds2).createTable;
+  ds2.Open;
   ds2.Fields[0].DisplayWidth := 25 ;
-    ds2.Fields[1].DisplayWidth := 25 ;
-      ds2.Fields[2].DisplayWidth := 25 ;
-//  ds2.AppendRecord(['key','KeyName','KEY']);
-//  ds2.AppendRecord(['VALUE','VALUE','Reg_String']);
+  ds2.Fields[1].DisplayWidth := 25 ;
+  ds2.Fields[2].DisplayWidth := 25 ;
+
+  Self.edt1.Text := '';
+  Self.ReloadReg;
+  Self.ds1.DataSet := ds2;
+  //  Self.btn2.Default := true;
+  self.btnTest.Visible := False;
 end;
 
 procedure TForm1.btn1Click(Sender: TObject);
@@ -172,6 +184,7 @@ end;
 //end;
 function toHk(s:string): DWORD;
 begin
+  s := Trim(s);
   if s = 'HKEY_CLASSES_ROOT' then
    result := HKEY_CLASSES_ROOT
   else if s = 'HKEY_CURRENT_USER' then result := HKEY_CURRENT_USER
@@ -179,14 +192,13 @@ begin
     else if s=  'HKEY_USERS' then result := HKEY_USERS
       else if s=  'HKEY_PERFORMANCE_DATA' then result := HKEY_PERFORMANCE_DATA
         else if s=  'HKEY_CURRENT_CONFIG' then result := HKEY_CURRENT_CONFIG
-          else if s=  'HKEY_DYN_DATA' then result := HKEY_DYN_DATA;
-  result :=  HKEY_CURRENT_USER;
+          else if s=  'HKEY_DYN_DATA' then result := HKEY_DYN_DATA
+  else
+    result :=  HKEY_CURRENT_USER;
 end;
 procedure TForm1.btn2Click(Sender: TObject);
 begin
-   self.ds2.EmptyDataSet;
-   Load(toHk(cbb1.Items[cbb1.itemIndex]),edt1.Text);
-   self.ds2.First;
+  Self.ReloadReg;
 end;
 procedure TForm1.Load(w:DWORD;Key:String);
 var
@@ -198,7 +210,7 @@ var
   ValueType :  TRegDataType ;
 
 HexStringOfBinaryValue : string;
-BinaryValue : Array[0..200] Of byte;
+BinaryValue : Array[0..2000] Of byte;
   aNumberOfBytes : integer;
 begin
   reg := TRegistry.Create(KEY_READ);
@@ -234,6 +246,7 @@ begin
        else  if ValueType = rdExpandString then
           ValueValue :=      (reg.readString(strings[i]))
        else if ValueType = rdBinary then begin
+           // if buffer size is less than the actually content size ,then cause error type .not "error size".be careful
            aNumberOfBytes := reg.ReadBinaryData(ValueName,BinaryValue,SizeOf(BinaryValue));
            HexStringOfBinaryValue := ConvertBinerToHex(BinaryValue, aNumberOfBytes);
            valuevalue := HexStringOfBinaryValue;
@@ -245,12 +258,17 @@ begin
   reg.Free;
 
 end;
-
+procedure TForm1.NavigateDown(path:string);
+begin
+  edt1.Text := edt1.text +path  +'\';
+  reloadReg;
+end;
 procedure TForm1.dbgrd1DblClick(Sender: TObject);
 begin
-         if ds2.FieldByName('type').asstring ='KEY' then
-    edt1.Text := edt1.text + ds2.fieldbyName('name').asstring +'\';
-  btn2.Click;
+  if ds2.FieldByName('type').asstring ='KEY' then
+     NavigateDown(  ds2.fieldbyName('name').asstring);
+
+
 end;
 
 //How to get path to the parent folder of a certain directory?
@@ -299,59 +317,8 @@ begin
     end;
   reg.Free;
 end;
-type
-  KeyNameForm = class(TForm)
-    FLabel :TLabel;
-    FEdit :TEdit;
-    FButton : TButton;
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-  public
-   constructor CreateNew(AOwner: TComponent; Dummy: Integer = 0); override;
-   class  function GetKeyName(OldKeyName:String=''):string;
-  end;
-class function KeyNameForm.GetKeyName(OldKeyName:String=''):string;
-var kn : KeyNameForm;
-begin
-  result := '';
-  kn := KeyNameForm.CreateNew(nil);
-  kn.FEdit.Text := oldKeyName;
-  if mrOK = kn.ShowModal then
-    result := kn.FEdit.text;
-  kn.Free;
-end;
-constructor KeyNameForm.CreateNew(AOwner: TComponent; Dummy: Integer = 0);
-const buttonY : integer = 34;
-const TextY : integer = 10;
-begin
-  inherited CreateNew(AOwner);
-  self.Position := poOwnerFormCenter ;
-  OnClose := FormClose;
 
-  FLabel := TLabel.Create(Self);
-  FLabel.SetBounds(10, TextY, 60, 24);
-  FLabel.Parent := Self;
-  FLabel.Caption := 'New Key Name';
 
-  FEdit := TEdit.Create(Self);
-  FEdit.SetBounds(100, TextY, 100, 24);
-  FEdit.Parent := Self;
-
-  FButton := TButton.Create(Self);
-  FButton.SetBounds(10, ButtonY, 60, 24);
-  FButton.Caption := 'OK';
-  FButton.Parent := Self;
-  FButton.ModalResult := mrOK;
-  FButton := TButton.Create(Self);
-  FButton.SetBounds(80, ButtonY, 60, 24);
-  FButton.Caption := 'Cancel';
-  FButton.Parent := Self;
-  FButton.ModalResult := mrCancel;
-end;
-
-procedure KeyNameForm.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  Action := caFree;
-end;
 procedure TForm1.btnAddClick(Sender: TObject);
 var k : string;
 begin
@@ -431,6 +398,68 @@ begin
   changeKeyName(toHk(cbb1.Items[cbb1.itemIndex]),IncludeTrailingPathDelimiter(edt1.Text)+ds2.FieldValues['name'],o);
 //   Load(toHk(cbb1.Items[cbb1.itemIndex]),edt1.Text);
    btn2Click(nil)
+end;
+procedure TForm1.ReloadReg;
+begin
+   self.ds2.EmptyDataSet;
+   Load(toHk(cbb1.Items[cbb1.itemIndex]),edt1.Text);
+   self.ds2.First;
+end;
+procedure TForm1.cbb1Change(Sender: TObject);
+begin
+  self.edt1.Text := '';
+  ReloadReg;
+end;
+
+procedure TForm1.edt1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+//  if (key =#13)then
+//    self.ReloadReg;
+end;
+
+procedure TForm1.edt1KeyPress(Sender: TObject; var Key: Char);
+begin
+  if (Key ='/') then
+    Key := '\'
+  else if (Key = #13) then
+    self.ReloadReg;
+end;
+
+procedure TForm1.dbgrd1KeyPress(Sender: TObject; var Key: Char);
+begin
+//  if (Key =  #13) then
+//    self.NavigateDown(ds2.fieldbyName('name').asstring);
+end;
+
+procedure TForm1.dbgrd1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = VK_RETURN)then begin
+    if ds2.FieldByName('type').asstring ='KEY' then
+      self.NavigateDown(ds2.fieldbyName('name').asstring)  end
+  else if (Key = VK_Back) then begin
+    edt1.Text := up(edt1.Text);
+    btn2Click(nil);
+  end;
+      
+end;
+
+procedure TForm1.btnTestClick(Sender: TObject);
+var ds2 : MemTable;
+begin
+    ds2 := MemTable.Create(nil);
+    ds2.FieldDefs.Add('Name',  ftString, 250, False);
+  ds2.FieldDefs.Add('Value', ftString,  250, False);
+  ds2.FieldDefs.Add('Type',  ftString,   250, False);// Key,Reg_String...
+//  ds2.CreateDataSet;
+  ds2.CreateTable;
+  ds2.Open;
+  ds2.Fields[0].DisplayWidth := 25 ;
+    ds2.Fields[1].DisplayWidth := 25 ;
+      ds2.Fields[2].DisplayWidth := 25 ;
+  ds2.AppendRecord(['key','KeyName','KEY']);
+  ds2.AppendRecord(['VALUE','VALUE','Reg_String']);
 end;
 
 end.
