@@ -247,9 +247,13 @@ begin
           ValueValue :=      (reg.readString(strings[i]))
        else if ValueType = rdBinary then begin
            // if buffer size is less than the actually content size ,then cause error type .not "error size".be careful
+           try
            aNumberOfBytes := reg.ReadBinaryData(ValueName,BinaryValue,SizeOf(BinaryValue));
            HexStringOfBinaryValue := ConvertBinerToHex(BinaryValue, aNumberOfBytes);
            valuevalue := HexStringOfBinaryValue;
+           except
+             ShowMessage('binary buffer must be small');
+           end;
        end;
        ds2.AppendRecord([ValueName,    valuevalue  ,Tostr(ValueType)]);
     end;
