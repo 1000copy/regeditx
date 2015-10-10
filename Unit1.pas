@@ -71,6 +71,7 @@ begin
   Self.ds1.DataSet := ds2;
   //  Self.btn2.Default := true;
   self.btnTest.Visible := False;
+  // why  HKEY_PERFORMANCE_DATA   HKEY_PERFORMANCE_DATA can not openkey ?
 end;
 
 procedure TForm1.btn1Click(Sender: TObject);

@@ -67,7 +67,6 @@ object Form1: TForm1
       Height = 21
       ImeName = #23567#29436#27627
       ItemHeight = 13
-      ItemIndex = 1
       TabOrder = 2
       Text = ' HKEY_CURRENT_USER'
       OnChange = cbb1Change
@@ -75,10 +74,8 @@ object Form1: TForm1
         ' HKEY_CLASSES_ROOT'
         ' HKEY_CURRENT_USER'
         ' HKEY_LOCAL_MACHINE'
-        ' HKEY_USERS           '
-        ' HKEY_PERFORMANCE_DATA '
-        ' HKEY_CURRENT_CONFIG  '
-        ' HKEY_DYN_DATA         ')
+        ' HKEY_USERS'
+        ' HKEY_CURRENT_CONFIG')
     end
     object btnUp: TButton
       Left = 544
