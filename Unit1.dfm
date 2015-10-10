@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 565
   Top = 292
-  Width = 815
+  Width = 927
   Height = 384
   Caption = 'Form1'
   Color = clBtnFace
@@ -17,7 +17,7 @@ object Form1: TForm1
   object dbgrd1: TDBGrid
     Left = 0
     Top = 49
-    Width = 799
+    Width = 911
     Height = 296
     Align = alClient
     DataSource = ds1
@@ -34,7 +34,7 @@ object Form1: TForm1
   object pnl1: TPanel
     Left = 0
     Top = 0
-    Width = 799
+    Width = 911
     Height = 49
     Align = alTop
     Caption = 'pnl1'
@@ -48,22 +48,13 @@ object Form1: TForm1
       TabOrder = 0
       Text = 'Software\MyCompanyName\MyApplication\'
     end
-    object btn1: TButton
-      Left = 632
-      Top = 16
-      Width = 49
-      Height = 25
-      Caption = 'populate'
-      TabOrder = 1
-      OnClick = btn1Click
-    end
     object btn2: TButton
-      Left = 696
+      Left = 520
       Top = 16
       Width = 49
       Height = 25
-      Caption = 'read'
-      TabOrder = 2
+      Caption = 'load'
+      TabOrder = 1
       OnClick = btn2Click
     end
     object cbb1: TComboBox
@@ -74,7 +65,7 @@ object Form1: TForm1
       ImeName = #23567#29436#27627
       ItemHeight = 13
       ItemIndex = 1
-      TabOrder = 3
+      TabOrder = 2
       Text = ' HKEY_CURRENT_USER'
       Items.Strings = (
         ' HKEY_CLASSES_ROOT'
@@ -84,6 +75,59 @@ object Form1: TForm1
         ' HKEY_PERFORMANCE_DATA '
         ' HKEY_CURRENT_CONFIG  '
         ' HKEY_DYN_DATA         ')
+    end
+    object btnUp: TButton
+      Left = 576
+      Top = 16
+      Width = 49
+      Height = 25
+      Caption = 'up'
+      TabOrder = 3
+      OnClick = btnUpClick
+    end
+    object btnDel: TButton
+      Left = 640
+      Top = 16
+      Width = 49
+      Height = 25
+      Caption = 'Delete'
+      TabOrder = 4
+      OnClick = btnDelClick
+    end
+    object btnEdit: TButton
+      Left = 696
+      Top = 16
+      Width = 49
+      Height = 25
+      Caption = 'Edit'
+      TabOrder = 5
+      OnClick = btnEditClick
+    end
+    object btnRoot: TButton
+      Left = 752
+      Top = 16
+      Width = 49
+      Height = 25
+      Caption = '\'
+      TabOrder = 6
+      OnClick = btnRootClick
+    end
+    object btnAdd: TButton
+      Left = 808
+      Top = 16
+      Width = 49
+      Height = 25
+      Caption = 'Add Key'
+      TabOrder = 7
+      OnClick = btnAddClick
+    end
+    object btnTest: TButton
+      Left = 864
+      Top = 16
+      Width = 33
+      Height = 25
+      Caption = 'T'
+      TabOrder = 8
     end
   end
   object ds1: TDataSource
