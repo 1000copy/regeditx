@@ -37,6 +37,7 @@ type
     procedure dbgrd1KeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure btnTestClick(Sender: TObject);
+    procedure edt1Change(Sender: TObject);
   private
     procedure Load(w: DWORD; Key: String);
     procedure ReloadReg;
@@ -214,6 +215,7 @@ HexStringOfBinaryValue : string;
 BinaryValue : Array[0..2000] Of byte;
   aNumberOfBytes : integer;
 begin
+
   reg := TRegistry.Create(KEY_READ);
   reg.RootKey := w;// HKEY_LOCAL_MACHINE;
   if (not reg.KeyExists(key)) then
@@ -265,7 +267,7 @@ begin
 end;
 procedure TForm1.NavigateDown(path:string);
 begin
-  edt1.Text := edt1.text +path  +'\';
+  edt1.Text := IncludeTrailingPathDelimiter(edt1.text) +path  +'\';
   reloadReg;
 end;
 procedure TForm1.dbgrd1DblClick(Sender: TObject);
@@ -465,6 +467,14 @@ begin
       ds2.Fields[2].DisplayWidth := 25 ;
   ds2.AppendRecord(['key','KeyName','KEY']);
   ds2.AppendRecord(['VALUE','VALUE','Reg_String']);
+end;
+function ConvertSlash(str:string):string;
+begin
+  Result := StringReplace(str,'/','\',[rfReplaceAll]);
+end;
+procedure TForm1.edt1Change(Sender: TObject);
+begin
+  edt1.Text := ConvertSlash(edt1.Text);
 end;
 
 end.

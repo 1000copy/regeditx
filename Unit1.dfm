@@ -48,7 +48,7 @@ object Form1: TForm1
       ImeName = #23567#29436#27627
       TabOrder = 0
       Text = 'Software\MyCompanyName\MyApplication\'
-      OnKeyDown = edt1KeyDown
+      OnChange = edt1Change
       OnKeyPress = edt1KeyPress
     end
     object btn2: TButton
